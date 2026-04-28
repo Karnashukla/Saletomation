@@ -1,0 +1,259 @@
+/* ============================================================================
+   YELLOWFIRST PROSPECTING - DESIGN TOKENS
+   ============================================================================
+   This is the single source of truth for the app's visual design.
+   Change values here → entire app rebrands. No other CSS file references
+   raw colors / fonts / sizes. Everything goes through these variables.
+
+   For white-label clients: override these variables in tenant_themes table,
+   which the Laravel app injects into a <style> tag in the HTML head. The
+   variables defined here are the *fallback defaults* (Yellowfirst branding).
+   ============================================================================ */
+
+:root {
+  /* ---------- BRAND COLORS ---------- */
+  /* Primary: classic business blue/white per Karna's spec */
+
+  --color-brand-primary:       #2563EB;   /* Strong blue - CTAs, active states */
+  --color-brand-primary-hover: #1D4ED8;
+  --color-brand-primary-light: #DBEAFE;   /* Subtle backgrounds */
+  --color-brand-primary-dark:  #1E40AF;
+
+  --color-brand-accent:        #F59E0B;   /* Warm yellow - signal highlights, accents */
+  --color-brand-accent-light:  #FEF3C7;
+  --color-brand-accent-dark:   #B45309;
+
+  /* ---------- NEUTRAL PALETTE ---------- */
+  /* Light mode (default) */
+
+  --color-bg:               #FFFFFF;       /* Page background */
+  --color-bg-subtle:        #F9FAFB;       /* Cards, panels */
+  --color-bg-muted:         #F3F4F6;       /* Hover states, dividers */
+  --color-bg-inverse:       #111827;       /* Tooltips, dark badges */
+
+  --color-text-primary:     #111827;       /* Body text */
+  --color-text-secondary:   #6B7280;       /* Helper text, labels */
+  --color-text-muted:       #9CA3AF;       /* Placeholders, disabled */
+  --color-text-inverse:     #FFFFFF;       /* Text on dark backgrounds */
+
+  --color-border:           #E5E7EB;
+  --color-border-strong:    #D1D5DB;
+  --color-border-focus:     var(--color-brand-primary);
+
+  /* ---------- SEMANTIC COLORS ---------- */
+
+  --color-success:          #10B981;       /* Replied, won, positive */
+  --color-success-light:    #D1FAE5;
+  --color-warning:          #F59E0B;       /* Pending, attention */
+  --color-warning-light:    #FEF3C7;
+  --color-danger:           #EF4444;       /* Failed, rejected, lost */
+  --color-danger-light:     #FEE2E2;
+  --color-info:             #3B82F6;
+  --color-info-light:       #DBEAFE;
+
+  /* ---------- SIGNAL STRENGTH HEAT ---------- */
+  /* Used on the dashboard to show signal intensity */
+
+  --color-signal-low:       #FEF3C7;       /* Mild signal */
+  --color-signal-medium:    #FCD34D;
+  --color-signal-high:      #F59E0B;
+  --color-signal-critical:  #DC2626;       /* Highest priority */
+
+  /* ---------- TYPOGRAPHY ---------- */
+  /* Karna requested editable hero vs non-hero font preferences */
+
+  --font-family-hero:       'Inter', system-ui, -apple-system, sans-serif;
+  --font-family-body:       'Inter', system-ui, -apple-system, sans-serif;
+  --font-family-mono:       'JetBrains Mono', 'Courier New', monospace;
+
+  /* Sizes - editable per heading level */
+  --font-size-display:      2.25rem;       /* 36px - hero numbers, page titles */
+  --font-size-h1:           1.875rem;      /* 30px */
+  --font-size-h2:           1.5rem;        /* 24px */
+  --font-size-h3:           1.25rem;       /* 20px */
+  --font-size-h4:           1.125rem;      /* 18px */
+  --font-size-h5:           1rem;          /* 16px */
+  --font-size-h6:           0.875rem;      /* 14px */
+  --font-size-body:         0.9375rem;     /* 15px - comfortable reading */
+  --font-size-small:        0.8125rem;     /* 13px */
+  --font-size-tiny:         0.75rem;       /* 12px */
+
+  --font-weight-regular:    400;
+  --font-weight-medium:     500;
+  --font-weight-semibold:   600;
+  --font-weight-bold:       700;
+
+  --line-height-tight:      1.2;
+  --line-height-normal:     1.5;
+  --line-height-relaxed:    1.7;
+
+  --letter-spacing-tight:   -0.02em;
+  --letter-spacing-normal:  0;
+  --letter-spacing-wide:    0.04em;
+
+  /* ---------- SPACING ---------- */
+  /* 4px-based scale */
+
+  --space-1:  0.25rem;    /* 4px */
+  --space-2:  0.5rem;     /* 8px */
+  --space-3:  0.75rem;    /* 12px */
+  --space-4:  1rem;       /* 16px */
+  --space-5:  1.25rem;    /* 20px */
+  --space-6:  1.5rem;     /* 24px */
+  --space-8:  2rem;       /* 32px */
+  --space-10: 2.5rem;     /* 40px */
+  --space-12: 3rem;       /* 48px */
+  --space-16: 4rem;       /* 64px */
+
+  /* ---------- RADII ---------- */
+
+  --radius-sm:   4px;
+  --radius-md:   8px;
+  --radius-lg:   12px;
+  --radius-xl:   16px;
+  --radius-full: 9999px;
+
+  /* ---------- SHADOWS ---------- */
+  /* Subtle, professional - no glowy/gradient nonsense */
+
+  --shadow-sm:  0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md:  0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg:  0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+  --shadow-xl:  0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+
+  /* ---------- TRANSITIONS ---------- */
+
+  --transition-fast:    100ms ease-out;
+  --transition-normal:  200ms ease-out;
+  --transition-slow:    300ms ease-out;
+
+  /* ---------- LAYOUT ---------- */
+
+  --sidebar-width:         260px;
+  --sidebar-width-collapsed: 64px;
+  --topbar-height:         56px;
+  --max-content-width:     1440px;
+
+  /* ---------- Z-INDEX SCALE ---------- */
+
+  --z-dropdown:   100;
+  --z-sticky:     200;
+  --z-overlay:    300;
+  --z-modal:      400;
+  --z-toast:      500;
+}
+
+/* ============================================================================
+   DARK MODE
+   ============================================================================
+   Karna requested day/night view. Triggered by `data-theme="dark"` on <html>.
+   Vue toggle in the topbar persists user preference to localStorage + DB.
+   ============================================================================ */
+
+[data-theme="dark"] {
+  --color-bg:               #0F172A;
+  --color-bg-subtle:        #1E293B;
+  --color-bg-muted:         #334155;
+  --color-bg-inverse:       #F1F5F9;
+
+  --color-text-primary:     #F1F5F9;
+  --color-text-secondary:   #94A3B8;
+  --color-text-muted:       #64748B;
+  --color-text-inverse:     #0F172A;
+
+  --color-border:           #334155;
+  --color-border-strong:    #475569;
+
+  /* Brand colors stay roughly the same — adjust only if contrast suffers */
+  --color-brand-primary-light: #1E3A8A;
+  --color-brand-accent-light:  #78350F;
+
+  /* Shadows are softer in dark mode */
+  --shadow-sm:  0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md:  0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg:  0 10px 15px -3px rgba(0, 0, 0, 0.5);
+}
+
+/* ============================================================================
+   WHITE-LABEL TENANT OVERRIDES
+   ============================================================================
+   The Laravel app injects per-tenant overrides as a <style> tag in <head>:
+
+     <style id="tenant-theme">
+       :root {
+         --color-brand-primary: #YOUR_COLOR;
+         --font-family-hero: 'YOUR_FONT', sans-serif;
+         ...
+       }
+     </style>
+
+   Tenant theme stored in `tenants.theme_config` JSON column. UI for editing
+   lives in /admin/branding (admin role only).
+   ============================================================================ */
+
+/* ============================================================================
+   BASE STYLES
+   ============================================================================
+   Minimal global reset — Tailwind handles most of this, but we set the
+   defaults that Tailwind doesn't.
+   ============================================================================ */
+
+html {
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-body);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg);
+  line-height: var(--line-height-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color var(--transition-normal), color var(--transition-normal);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-family-hero);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-tight);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-primary);
+}
+
+h1 { font-size: var(--font-size-h1); }
+h2 { font-size: var(--font-size-h2); }
+h3 { font-size: var(--font-size-h3); }
+h4 { font-size: var(--font-size-h4); }
+h5 { font-size: var(--font-size-h5); }
+h6 { font-size: var(--font-size-h6); }
+
+a {
+  color: var(--color-brand-primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+a:hover { color: var(--color-brand-primary-hover); }
+
+/* Focus ring — accessibility critical, never remove */
+*:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+/* Code/mono - signal evidence URLs, JSON snippets in dev tools */
+code, pre, kbd {
+  font-family: var(--font-family-mono);
+  font-size: 0.9em;
+}
+
+/* ============================================================================
+   MOBILE RESPONSIVE BREAKPOINTS
+   ============================================================================
+   Karna requested mobile compatibility for on-the-go draft review.
+   Tailwind handles most of this, but a few global rules:
+   ============================================================================ */
+
+@media (max-width: 640px) {
+  :root {
+    --font-size-h1:   1.5rem;
+    --font-size-h2:   1.25rem;
+    --sidebar-width:  100vw; /* Full-screen drawer on mobile */
+  }
+}
