@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Yellowfirst Sales Prospect — Live Prototype v2</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.4.21/vue.global.prod.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --color-brand-primary: #2563EB;
+      --color-brand-primary-hover: #1D4ED8;
+      --color-brand-primary-light: #DBEAFE;
+      --color-brand-accent: #F59E0B;
+      --color-bg: #FFFFFF;
+      --color-bg-subtle: #F9FAFB;
+      --color-bg-muted: #F3F4F6;
+      --color-text-primary: #111827;
+      --color-text-secondary: #6B7280;
+      --color-text-muted: #9CA3AF;
+      --color-border: #E5E7EB;
+      --color-border-strong: #D1D5DB;
+      --color-success: #10B981;
+      --color-success-light: #D1FAE5;
+      --color-warning: #F59E0B;
+      --color-warning-light: #FEF3C7;
+      --color-danger: #EF4444;
+      --color-danger-light: #FEE2E2;
+    }
+    [data-theme="dark"] {
+      --color-bg: #0F172A;
+      --color-bg-subtle: #1E293B;
+      --color-bg-muted: #334155;
+      --color-text-primary: #F1F5F9;
+      --color-text-secondary: #94A3B8;
+      --color-text-muted: #64748B;
+      --color-border: #334155;
+      --color-border-strong: #475569;
+      --color-brand-primary-light: #1E3A8A;
+      --color-success-light: #064E3B;
+      --color-warning-light: #78350F;
+      --color-danger-light: #7F1D1D;
+    }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--color-bg-subtle);
+      color: var(--color-text-primary);
+      -webkit-font-smoothing: antialiased;
+    }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--color-border-strong); border-radius: 4px; }
+
+    .bg-app { background: var(--color-bg); }
+    .bg-app-subtle { background: var(--color-bg-subtle); }
+    .bg-app-muted { background: var(--color-bg-muted); }
+    .text-app { color: var(--color-text-primary); }
+    .text-app-secondary { color: var(--color-text-secondary); }
+    .text-app-muted { color: var(--color-text-muted); }
+    .border-app { border-color: var(--color-border); }
+    .border-app-strong { border-color: var(--color-border-strong); }
+
+    .btn-primary { background: var(--color-brand-primary); color: white; transition: background 150ms; }
+    .btn-primary:hover { background: var(--color-brand-primary-hover); }
+
+    .signal-low { background: var(--color-warning-light); color: #92400E; }
+    .signal-medium { background: #FCD34D; color: #78350F; }
+    .signal-high { background: var(--color-warning); color: white; }
+    .signal-critical { background: var(--color-danger); color: white; }
+    [data-theme="dark"] .signal-low { color: #FEF3C7; }
+    [data-theme="dark"] .signal-medium { background: #B45309; color: #FEF3C7; }
+
+    .card-hover { transition: all 150ms ease; }
+    .card-hover:hover { transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.08); }
+
+    .view-enter { animation: fadeIn 200ms ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    .toast-enter { animation: slideUp 200ms ease-out; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    .stage-prospecting { border-color: #6366F1; background: #EEF2FF; color: #4338CA; }
+    .stage-qualification { border-color: #06B6D4; background: #ECFEFF; color: #0E7490; }
+    .stage-proposal { border-color: #F59E0B; background: #FEF3C7; color: #B45309; }
+    .stage-negotiation { border-color: #8B5CF6; background: #EDE9FE; color: #6D28D9; }
+    .stage-won { border-color: #10B981; background: #D1FAE5; color: #047857; }
+    .stage-lost { border-color: #EF4444; background: #FEE2E2; color: #B91C1C; }
+    [data-theme="dark"] .stage-prospecting { background: #312E81; color: #C7D2FE; }
+    [data-theme="dark"] .stage-qualification { background: #164E63; color: #A5F3FC; }
+    [data-theme="dark"] .stage-proposal { background: #78350F; color: #FED7AA; }
+    [data-theme="dark"] .stage-negotiation { background: #4C1D95; color: #DDD6FE; }
+    [data-theme="dark"] .stage-won { background: #064E3B; color: #A7F3D0; }
+    [data-theme="dark"] .stage-lost { background: #7F1D1D; color: #FECACA; }
+
+    .ctx-section { border-bottom: 1px solid var(--color-border); padding: 16px 20px; }
+    .ctx-section:last-child { border-bottom: none; }
+    .ctx-rail { max-height: calc(100vh - 56px); overflow-y: auto; }
+  </style>
+</head>
+
+<body>
+  <div id="app"></div>
+
+  <script>
+    const { createApp, ref, computed } = Vue;
+
+    const team = [
+      { id: 'u1', name: 'Karna Shukla', initials: 'KS', email: 'karna@yellowfirst.com', color: '#2563EB', role: 'Owner' },
+      { id: 'u2', name: 'Jassi Marty', initials: 'JM', email: 'jassi@yellowfirst.com', color: '#10B981', role: 'Sales' },
+      { id: 'u3', name: 'Reez Shukla', initials: 'RS', email: 'reez@yellowfirst.com', color: '#F59E0B', role: 'Sales' },
+      { id: 'u4', name: 'Priya Nair', initials: 'PN', email: 'priya@yellowfirst.com', color: '#8B5CF6', role: 'Sales' },
+    ];
+
+    const fakeData = {
+      todayDate: 'Tuesday, April 28, 2026',
+      tenant: { name: 'Yellowfirst', slug: 'yellowfirst' },
+      currentUser: team[0],
+      team,
+      stats: {
+        prospects_today: 9, emails_pending_approval: 7,
+        in_negotiation: 3, in_negotiation_value: 285000,
+        target_revenue_q: 750000, actual_revenue_q: 412000,
+      },
+      pipeline: [
+        { id: 'prospecting', name: 'Prospecting', count: 47, value: 0, color: 'stage-prospecting' },
+        { id: 'qualification', name: 'Qualification', count: 12, value: 380000, color: 'stage-qualification' },
+        { id: 'proposal', name: 'Proposal Sent', count: 6, value: 425000, color: 'stage-proposal' },
+        { id: 'negotiation', name: 'Negotiation', count: 3, value: 285000, color: 'stage-negotiation' },
+        { id: 'won', name: 'Closed Won', count: 4, value: 412000, color: 'stage-won' },
+        { id: 'lost', name: 'Closed Lost', count: 2, value: 0, color: 'stage-lost' },
+      ],
+      openDeals: [
+        { id: 'd1', company: 'Caelis Inc', contact: 'Maria Santos', stage: 'negotiation', value: 120000, owner: 'u1', daysInStage: 4, expectedClose: 'Q2 2026' },
+        { id: 'd2', company: 'Norvex AI', contact: 'James Liu', stage: 'negotiation', value: 95000, owner: 'u2', daysInStage: 12, expectedClose: 'Q2 2026' },
+        { id: 'd3', company: 'Brightline', contact: 'Olivia Park', stage: 'negotiation', value: 70000, owner: 'u1', daysInStage: 8, expectedClose: 'Q3 2026' },
+        { id: 'd4', company: 'Pixsa', contact: 'Tom Rivers', stage: 'proposal', value: 85000, owner: 'u3', daysInStage: 3, expectedClose: 'Q2 2026' },
+        { id: 'd5', company: 'Cardinal Tech', contact: 'Diana Ross', stage: 'proposal', value: 140000, owner: 'u1', daysInStage: 5, expectedClose: 'Q2 2026' },
+      ],
+      businessUnits: ['All BUs', 'US', 'EU', 'India / APAC', 'Australia'],
+      companies: [
+        { id: 1, name: 'Linewatch', size: 'small', employees: 65, industry: 'B2B SaaS / DevOps', location: 'San Francisco, CA', logo: 'L', logoColor: '#2563EB', score: 87, funding: 'Series A · $12M · 8 weeks ago', assignedTo: 'u1',
+          signals: [
+            { id: 'funding_round', label: 'Series A raised', strength: 'critical', date: '2026-03-04', evidence: 'Closed $12M Series A led by Accel. TechCrunch coverage.' },
+            { id: 'hiring_in_target_function', label: 'Hiring 4 senior engineers', strength: 'high', date: '2026-04-15', evidence: '4 open eng roles posted in last 2 weeks (Backend, Platform x2, ML)' },
+            { id: 'product_launch', label: 'New product line teased', strength: 'medium', date: '2026-04-21', evidence: 'CEO LinkedIn post about "next chapter" with screenshot of new dashboard.' },
+          ],
+          prospects: [
+            { id: 11, name: 'Sarah Chen', title: 'CTO & Co-founder', linkedin: 'sarahchen', email: 's.chen@linewatch.com', emailConfidence: 92, function: 'engineering', status: 'draft_ready' },
+            { id: 12, name: 'Marcus Webb', title: 'VP Engineering', linkedin: 'mwebb', email: 'm.webb@linewatch.com', emailConfidence: 92, function: 'engineering', status: 'draft_ready' },
+          ],
+          rationale: 'Just funded, hiring senior engineers fast, CTO posting about "next chapter." Bullseye for Series A-C profile — every signal points to scaling pain.',
+        },
+        { id: 2, name: 'Helio API', size: 'small', employees: 42, industry: 'API Infrastructure', location: 'Austin, TX', logo: 'H', logoColor: '#F59E0B', score: 78, funding: 'Seed · $4M · 18 months ago', assignedTo: null,
+          signals: [
+            { id: 'leadership_change', label: 'New VP Product hired', strength: 'high', date: '2026-04-10', evidence: 'Priya Anand joined as VP Product from Stripe (LinkedIn announcement).' },
+            { id: 'product_launch', label: 'V2 launch in progress', strength: 'high', date: '2026-04-18', evidence: 'Public roadmap shows v2 GA targeted Q3.' },
+            { id: 'hiring_in_target_function', label: 'Hiring product designers', strength: 'medium', date: '2026-04-12', evidence: '2 product designer roles open.' },
+          ],
+          prospects: [
+            { id: 21, name: 'Priya Anand', title: 'VP Product (new)', linkedin: 'priyaa', email: 'priya@helioapi.com', emailConfidence: 78, function: 'product', status: 'draft_ready' },
+            { id: 22, name: 'David Kim', title: 'Founder & CEO', linkedin: 'davidkimm', email: 'david@helioapi.com', emailConfidence: 88, function: 'executive', status: 'draft_ready' },
+          ],
+          rationale: 'New VP Product is the angle — she just landed and is shaping team structure. The "two-person product team" pitch is timely.',
+        },
+        { id: 3, name: 'Coalmark', size: 'small', employees: 88, industry: 'Vertical SaaS / Construction Tech', location: 'Denver, CO', logo: 'C', logoColor: '#10B981', score: 71, funding: 'Series A · $8M · 14 months ago', assignedTo: 'u2',
+          signals: [
+            { id: 'headcount_growth', label: 'Headcount up 38% in 6 months', strength: 'high', date: '2026-04-01', evidence: 'LinkedIn shows 64 → 88 employees since October.' },
+            { id: 'hiring_surge', label: '11 open roles', strength: 'medium', date: '2026-04-20', evidence: '11 active roles across eng, product, sales.' },
+          ],
+          prospects: [
+            { id: 31, name: 'Tom Riley', title: 'CTO', linkedin: 'tomriley', email: 't.riley@coalmark.io', emailConfidence: 85, function: 'engineering', status: 'draft_ready' },
+          ],
+          rationale: 'Pure scale pain — 38% headcount growth with no fresh funding. CTO is feeling the squeeze of growing team without proportional efficiency gains.',
+        },
+        { id: 4, name: 'Threadly', size: 'small', employees: 51, industry: 'B2B SaaS / MarTech', location: 'New York, NY', logo: 'T', logoColor: '#8B5CF6', score: 68, funding: 'Series A · $7M · 10 months ago', assignedTo: null,
+          signals: [
+            { id: 'product_launch', label: 'AI-powered redesign launched', strength: 'high', date: '2026-04-15', evidence: 'ProductHunt launch April 15, top 5 of the day.' },
+            { id: 'social_growth', label: 'Twitter follower growth +47% in 60 days', strength: 'medium', date: '2026-04-20', evidence: 'Public profile tracking shows growth from 8.4k to 12.3k followers.' },
+          ],
+          prospects: [
+            { id: 41, name: 'Alex Foster', title: 'Co-founder & CTO', linkedin: 'alexfoster', email: 'alex@threadly.app', emailConfidence: 90, function: 'engineering', status: 'draft_ready' },
+          ],
+          rationale: 'Just shipped AI features — already AI-curious. Easier to pitch AI-first execution model when they\'ve seen LLMs work for them.',
+        },
+        { id: 5, name: 'Rasa Health', size: 'small', employees: 73, industry: 'HealthTech', location: 'Boston, MA', logo: 'R', logoColor: '#EC4899', score: 64, funding: 'Series A · $9M · 6 months ago', assignedTo: null,
+          signals: [
+            { id: 'hiring_in_target_function', label: '3 senior eng roles', strength: 'medium', date: '2026-04-19', evidence: 'Backend + Data Eng + ML Eng roles open.' },
+            { id: 'leadership_change', label: 'New Head of Engineering', strength: 'medium', date: '2026-03-28', evidence: 'Sanjay Mehta joined from Oscar Health.' },
+          ],
+          prospects: [
+            { id: 51, name: 'Sanjay Mehta', title: 'Head of Engineering', linkedin: 'sanjaymehta', email: 's.mehta@rasahealth.com', emailConfidence: 82, function: 'engineering', status: 'draft_ready' },
+          ],
+          rationale: 'New Head of Eng is hiring his first team. Open to alternative team structures before culture sets.',
+        },
+        { id: 6, name: 'Vellum', size: 'mid', employees: 480, industry: 'Enterprise Software / FinTech', location: 'Remote (US)', logo: 'V', logoColor: '#0EA5E9', score: 82, funding: 'Series C · $58M · 4 months ago', assignedTo: 'u1',
+          signals: [
+            { id: 'funding_round', label: 'Series C closed', strength: 'critical', date: '2025-12-18', evidence: 'Closed $58M Series C led by Insight Partners.' },
+            { id: 'leadership_change', label: 'New Chief Product Officer', strength: 'high', date: '2026-03-22', evidence: 'Hired Jenna Park from Plaid as CPO.' },
+            { id: 'product_launch', label: 'New SMB product line announced', strength: 'high', date: '2026-04-08', evidence: 'CEO blog post: "Vellum for Small Business" — Q3 launch.' },
+          ],
+          prospects: [
+            { id: 61, name: 'Jenna Park', title: 'Chief Product Officer (new)', linkedin: 'jennapark', email: 'jpark@vellum.com', emailConfidence: 88, function: 'product', status: 'draft_ready' },
+            { id: 62, name: 'Robert Chiu', title: 'VP Engineering', linkedin: 'rchiu', email: 'rchiu@vellum.com', emailConfidence: 88, function: 'engineering', status: 'draft_ready' },
+          ],
+          rationale: 'Scaleup pitch territory. New CPO + new SMB product line + fresh capital = need for "new-bet execution arm." Don\'t pitch core product, pitch the SMB expansion.',
+        },
+        { id: 7, name: 'Foundry Labs', size: 'mid', employees: 720, industry: 'B2B SaaS / Developer Tools', location: 'San Francisco, CA', logo: 'F', logoColor: '#6366F1', score: 75, funding: 'Series C · $80M · 9 months ago', assignedTo: 'u3',
+          signals: [
+            { id: 'product_launch', label: 'New AI agent platform launched', strength: 'critical', date: '2026-04-22', evidence: 'Major product announcement at Foundry Day 2026.' },
+            { id: 'hiring_in_target_function', label: '12 AI/ML engineering roles', strength: 'high', date: '2026-04-20', evidence: 'Heavy hiring across ML platform, agents team.' },
+          ],
+          prospects: [
+            { id: 71, name: 'Daniel Reyes', title: 'VP Product, AI Platform', linkedin: 'danielreyes', email: 'd.reyes@foundrylabs.io', emailConfidence: 86, function: 'product', status: 'draft_ready' },
+          ],
+          rationale: 'They\'re building AI agents — perfect audience for "agent mesh + 2 humans" pitch. They get the architecture. Lead with technical credibility.',
+        },
+        { id: 8, name: 'Northsea', size: 'mid', employees: 1200, industry: 'B2B SaaS / Logistics', location: 'Amsterdam, NL', logo: 'N', logoColor: '#14B8A6', score: 69, funding: 'Pre-IPO · $200M+ raised', assignedTo: null,
+          signals: [
+            { id: 'ipo_activity', label: 'IPO rumors / banker hires', strength: 'high', date: '2026-04-05', evidence: 'Bloomberg reported confidential S-1 filing in progress.' },
+            { id: 'leadership_change', label: 'New Chief Innovation Officer', strength: 'medium', date: '2026-03-18', evidence: 'Hired CINO from Shopify Plus.' },
+          ],
+          prospects: [
+            { id: 81, name: 'Ingrid Larsson', title: 'Chief Innovation Officer', linkedin: 'ingridl', email: 'i.larsson@northsea.eu', emailConfidence: 80, function: 'innovation', status: 'draft_ready' },
+          ],
+          rationale: 'Pre-IPO scaleup with new CINO charter — innovation arm needs to ship to justify IPO valuation. New-bet execution pitch fits.',
+        },
+        { id: 9, name: 'Meridian Financial', size: 'enterprise', employees: 18000, industry: 'Financial Services', location: 'Charlotte, NC', logo: 'M', logoColor: '#1E40AF', score: 73, funding: 'Public · NYSE: MFG', assignedTo: 'u4',
+          signals: [
+            { id: 'leadership_change', label: 'New Chief Digital Officer', strength: 'critical', date: '2026-04-02', evidence: 'Press release: appointed new CDO from JPMorgan Digital.' },
+            { id: 'conference_buzz', label: 'CDO speaking at FinTech Summit May 14', strength: 'high', date: '2026-04-15', evidence: 'Listed as keynote speaker.' },
+            { id: 'product_launch', label: 'AI-powered customer portal in beta', strength: 'medium', date: '2026-03-12', evidence: 'Earnings call mentioned "AI-first customer experience initiative."' },
+          ],
+          prospects: [
+            { id: 91, name: 'Marcus Williams', title: 'Chief Digital Officer (new)', linkedin: 'mwilliams', email: 'marcus.williams@meridianfg.com', emailConfidence: 75, function: 'digital', status: 'draft_ready' },
+            { id: 92, name: 'Linda Park', title: 'VP Innovation', linkedin: 'lindapark', email: 'linda.park@meridianfg.com', emailConfidence: 75, function: 'innovation', status: 'draft_ready' },
+          ],
+          rationale: 'New CDO 90 days in = looking to establish wins. Speaking at FinTech Summit means he\'s building public profile. Yellowfirst as the "fast lane" partner for his first visible initiative.',
+        },
+      ],
+      draftEmail: {
+        prospectId: 11,
+        subject: "Two people. Your entire product. It's already knocking.",
+        from: 'karna@yellowfirst.com',
+        signalsUsed: ['Series A raised', 'Hiring 4 senior engineers', '"Next chapter" post'],
+        body: `Sarah,
+
+Saw the Series A close last month — congrats on the Accel round. Also noticed you're hiring four senior engineers right now, and your "next chapter" post hinted at something bigger coming.
+
+Here's the awkward question: what if you didn't hire all four?
+
+We run an AI-first execution model at Yellowfirst — two humans (an AI UX designer + a full-stack prompt engineer) plus a mesh of specialized agents — that ships product work that used to take a team of ten. Not a tool, not a methodology talk. An actual delivery model.
+
+For a Series A team scaling fast, the math gets interesting: roles → systems. You hire the irreplaceable people; we run the execution layer underneath.
+
+Worth a 20-minute look?
+
+— Karna
+Founder, Yellowfirst
+yellowfirst.com/ai-first-team`,
+        followUps: [
+          { day: 3, subject: "Re: Two people. Your entire product. It's already knocking.", preview: "Wanted to bump this up — saw your team posted two more roles since I last wrote..." },
+          { day: 5, subject: "Quick one", preview: "Last note before I drop off your inbox. The 3-layer model deck I mentioned..." },
+          { day: 7, subject: "Closing the loop", preview: "Closing the loop on this thread. If timing's wrong, totally understood..." },
+        ],
+      },
+    };
+
+    const App = {
+      setup() {
+        const currentView = ref('dashboard');
+        const selectedCompanyId = ref(null);
+        const selectedProspectId = ref(null);
+        const editedDraft = ref({ ...fakeData.draftEmail });
+        const draftEdited = ref(false);
+        const showRejectModal = ref(false);
+        const showAssignMenu = ref(null);
+        const rejectionReason = ref('');
+        const rejectionNote = ref('');
+        const theme = ref('light');
+        const toast = ref(null);
+        const sidebarOpen = ref(false);
+        const mobileContextOpen = ref(false);
+        const stats = fakeData.stats;
+        const companies = ref(fakeData.companies);
+        const sizeFilter = ref('all');
+        const ownerFilter = ref('all');
+
+        const filteredCompanies = computed(() => {
+          let list = companies.value;
+          if (sizeFilter.value !== 'all') list = list.filter(c => c.size === sizeFilter.value);
+          if (ownerFilter.value === 'mine') list = list.filter(c => c.assignedTo === fakeData.currentUser.id);
+          else if (ownerFilter.value === 'unassigned') list = list.filter(c => !c.assignedTo);
+          else if (ownerFilter.value !== 'all') list = list.filter(c => c.assignedTo === ownerFilter.value);
+          return list;
+        });
+        const selectedCompany = computed(() => companies.value.find(c => c.id === selectedCompanyId.value));
+        const selectedProspect = computed(() => {
+          if (!selectedCompany.value || !selectedProspectId.value) return null;
+          return selectedCompany.value.prospects.find(p => p.id === selectedProspectId.value);
+        });
+        const revenueProgress = computed(() => Math.round((stats.actual_revenue_q / stats.target_revenue_q) * 100));
+
+        function getUser(id) { return fakeData.team.find(u => u.id === id); }
+        function navigate(view, data = {}) {
+          currentView.value = view;
+          if (data.companyId !== undefined) selectedCompanyId.value = data.companyId;
+          if (data.prospectId !== undefined) selectedProspectId.value = data.prospectId;
+          if (data.companyId && view === 'draft' && !data.prospectId) {
+            const c = companies.value.find(c => c.id === data.companyId);
+            if (c && c.prospects.length) selectedProspectId.value = c.prospects[0].id;
+          }
+          window.scrollTo(0, 0);
+          sidebarOpen.value = false;
+          mobileContextOpen.value = false;
+        }
+        function approveDraft() { showToast('Draft approved. First send queued for next batch (within 15 min).'); setTimeout(() => navigate('dashboard'), 1200); }
+        function openRejectModal() { showRejectModal.value = true; }
+        function submitRejection() {
+          if (!rejectionReason.value) return;
+          showRejectModal.value = false;
+          showToast(`Rejected: "${rejectionReason.value}". Agent will learn from this.`);
+          rejectionReason.value = ''; rejectionNote.value = '';
+          setTimeout(() => navigate('dashboard'), 1200);
+        }
+        function toggleTheme() {
+          theme.value = theme.value === 'light' ? 'dark' : 'light';
+          document.documentElement.setAttribute('data-theme', theme.value);
+        }
+        function showToast(msg) { toast.value = msg; setTimeout(() => { toast.value = null; }, 3500); }
+        function assignCompany(companyId, userId) {
+          const c = companies.value.find(c => c.id === companyId);
+          if (c) {
+            c.assignedTo = userId;
+            const user = userId ? getUser(userId) : null;
+            showToast(user ? `Assigned ${c.name} to ${user.name}` : `Unassigned ${c.name}`);
+          }
+          showAssignMenu.value = null;
+        }
+        function signalStrengthClass(s) {
+          return { critical: 'signal-critical', high: 'signal-high', medium: 'signal-medium', low: 'signal-low' }[s] || 'signal-low';
+        }
+        function sizeBadgeClass(size) {
+          return { small: 'bg-blue-50 text-blue-700 border-blue-200', mid: 'bg-purple-50 text-purple-700 border-purple-200', enterprise: 'bg-emerald-50 text-emerald-700 border-emerald-200' }[size];
+        }
+        function relativeDate(iso) {
+          const days = Math.floor((new Date('2026-04-28') - new Date(iso)) / 86400000);
+          if (days <= 0) return 'today';
+          if (days === 1) return 'yesterday';
+          if (days < 7) return `${days} days ago`;
+          if (days < 30) return `${Math.floor(days / 7)}w ago`;
+          return `${Math.floor(days / 30)}mo ago`;
+        }
+        function formatMoney(n) {
+          if (n >= 1000000) return `$${(n / 1000000).toFixed(1)}M`;
+          if (n >= 1000) return `$${(n / 1000).toFixed(0)}k`;
+          return `$${n}`;
+        }
+
+        return {
+          currentView, navigate, theme, toggleTheme, sidebarOpen, mobileContextOpen,
+          companies: filteredCompanies, sizeFilter, ownerFilter, businessUnits: fakeData.businessUnits,
+          selectedCompany, selectedProspect, selectedCompanyId, selectedProspectId,
+          stats, revenueProgress, pipeline: fakeData.pipeline, openDeals: fakeData.openDeals,
+          draftEmail: fakeData.draftEmail, editedDraft, draftEdited,
+          approveDraft, openRejectModal, showRejectModal, rejectionReason, rejectionNote, submitRejection,
+          showAssignMenu, assignCompany, getUser,
+          team: fakeData.team, currentUser: fakeData.currentUser,
+          toast,
+          signalStrengthClass, sizeBadgeClass, relativeDate, formatMoney,
+          tenant: fakeData.tenant, todayDate: fakeData.todayDate,
+        };
+      },
+      template: `
+      <div class="min-h-screen flex">
+        <aside class="fixed lg:sticky top-0 left-0 h-screen z-30 transition-transform flex-shrink-0"
+          :class="[sidebarOpen ? 'translate-x-0' : '-translate-x-full', 'lg:translate-x-0']"
+          style="width: 240px; background: var(--color-bg); border-right: 1px solid var(--color-border);">
+          <div class="h-14 flex items-center justify-between px-5 border-b border-app">
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 rounded-md flex items-center justify-center font-bold text-white text-sm" style="background: var(--color-brand-primary);">Y</div>
+              <span class="font-semibold text-app text-sm tracking-tight">{{ tenant.name }}</span>
+            </div>
+            <button @click="sidebarOpen = false" class="lg:hidden text-app-muted">×</button>
+          </div>
+          <nav class="p-3 space-y-0.5 text-sm overflow-y-auto" style="height: calc(100vh - 56px - 64px);">
+            <button @click="navigate('dashboard')" :class="['w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-left transition-colors', currentView === 'dashboard' ? 'bg-app-muted text-app font-medium' : 'text-app-secondary hover:bg-app-subtle']">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+              Dashboard
+            </button>
+            <div class="pt-3 pb-1 px-3 text-xs font-medium text-app-muted uppercase tracking-wider">Prospects</div>
+            <button @click="navigate('dashboard')" class="w-full flex items-center justify-between gap-2.5 px-3 py-2 rounded-md text-app-secondary hover:bg-app-subtle">
+              <span class="flex items-center gap-2.5">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                Today's list
+              </span>
+              <span class="text-xs font-semibold px-1.5 py-0.5 rounded text-white" style="background: var(--color-brand-primary);">9</span>
+            </button>
+            <button class="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-app-secondary hover:bg-app-subtle">By company</button>
+            <button class="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-app-secondary hover:bg-app-subtle">By person</button>
+            <button class="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-app-secondary hover:bg-app-subtle">All prospect lists</button>
+
+            <div class="pt-3 pb-1 px-3 text-xs font-medium text-app-muted uppercase tracking-wider">Network</div>
+            <button class="w-full flex items-center justify-between gap-2.5 px-3 py-2 rounded-md text-app-secondary hover:bg-app-subtle">
+              <span>Connections</span><span class="text-xs text-app-muted">11.3k</span>
+            </button>
+            <button class="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-app-secondary hover:bg-app-subtle">Warm intros</button>
+
+            <div class="pt-3 pb-1 px-3 text-xs font-medium text-app-muted uppercase tracking-wider">Pipeline</div>
+            <button class="w-full flex items-center justify-between gap-2.5 px-3 py-2 rounded-md text-app-secondary hover:bg-app-subtle">
+              <span>To-do / Tasks</span><span class="text-xs px-1.5 py-0.5 rounded text-app-muted" style="background: var(--color-bg-muted);">12</span>
+            </button>
+            <button class="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-app-secondary hover:bg-app-subtle">Pipeline</button>
+
+            <div class="pt-3 pb-1 px-3 text-xs font-medium text-app-muted uppercase tracking-wider">Admin</div>
+            <button class="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-app-secondary hover:bg-app-subtle">Settings</button>
+            <button class="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-app-secondary hover:bg-app-subtle">Team & users</button>
+          </nav>
+          <div class="absolute bottom-0 left-0 right-0 p-3 border-t border-app" style="background: var(--color-bg);">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-semibold" :style="{ background: currentUser.color }">{{ currentUser.initials }}</div>
+              <div class="flex-1 min-w-0">
+                <div class="text-sm font-medium text-app truncate">{{ currentUser.name }}</div>
+                <div class="text-xs text-app-muted truncate">{{ currentUser.email }}</div>
+              </div>
+              <button @click="toggleTheme" class="text-app-muted hover:text-app">
+                <svg v-if="theme === 'light'" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                <svg v-else class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+              </button>
+            </div>
+          </div>
+        </aside>
+
+        <div v-if="sidebarOpen" @click="sidebarOpen = false" class="lg:hidden fixed inset-0 bg-black/40 z-20"></div>
+
+        <main class="flex-1 min-w-0 flex flex-col">
+          <header class="h-14 sticky top-0 z-10 flex items-center justify-between px-4 lg:px-6 border-b border-app flex-shrink-0" style="background: var(--color-bg);">
+            <div class="flex items-center gap-3">
+              <button @click="sidebarOpen = !sidebarOpen" class="lg:hidden text-app">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+              </button>
+              <nav class="flex items-center gap-2 text-sm">
+                <button @click="navigate('dashboard')" class="text-app-secondary hover:text-app">Dashboard</button>
+                <span v-if="currentView !== 'dashboard'" class="text-app-muted">/</span>
+                <button v-if="currentView === 'company' || currentView === 'draft'" @click="navigate('company', { companyId: selectedCompany.id })" class="text-app-secondary hover:text-app">{{ selectedCompany?.name }}</button>
+                <span v-if="currentView === 'draft'" class="text-app-muted">/</span>
+                <span v-if="currentView === 'draft'" class="text-app font-medium">{{ selectedProspect?.name }}</span>
+              </nav>
+            </div>
+            <div class="flex items-center gap-3">
+              <button v-if="currentView === 'draft'" @click="mobileContextOpen = !mobileContextOpen" class="lg:hidden px-3 py-1 text-xs rounded border border-app text-app-secondary">{{ mobileContextOpen ? 'Hide' : 'Show' }} context</button>
+              <span class="hidden md:block text-xs text-app-muted font-mono">{{ todayDate }}</span>
+              <button class="text-app-muted hover:text-app">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+              </button>
+            </div>
+          </header>
+
+          <!-- DASHBOARD -->
+          <div v-if="currentView === 'dashboard'" class="flex-1 p-4 lg:p-6 view-enter overflow-y-auto">
+            <div class="mb-5">
+              <h1 class="text-2xl font-semibold tracking-tight text-app">Today's prospects</h1>
+              <p class="text-sm text-app-secondary mt-1">9 high-signal companies surfaced by the agent at 8:00 AM. Review, assign, and approve drafts.</p>
+            </div>
+
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+              <div class="bg-app rounded-lg border border-app p-4">
+                <div class="text-xs font-medium text-app-muted uppercase tracking-wider">Today</div>
+                <div class="text-2xl font-semibold text-app mt-1">{{ stats.prospects_today }}</div>
+                <div class="text-xs text-app-secondary mt-0.5">new prospects</div>
+              </div>
+              <div class="bg-app rounded-lg border border-app p-4">
+                <div class="text-xs font-medium text-app-muted uppercase tracking-wider">Pending</div>
+                <div class="text-2xl font-semibold text-app mt-1">{{ stats.emails_pending_approval }}</div>
+                <div class="text-xs text-app-secondary mt-0.5">drafts awaiting review</div>
+              </div>
+              <div class="bg-app rounded-lg border border-app p-4">
+                <div class="text-xs font-medium text-app-muted uppercase tracking-wider">Negotiation</div>
+                <div class="text-2xl font-semibold text-app mt-1">{{ formatMoney(stats.in_negotiation_value) }}</div>
+                <div class="text-xs text-app-secondary mt-0.5">{{ stats.in_negotiation }} deals open</div>
+              </div>
+              <div class="bg-app rounded-lg border border-app p-4">
+                <div class="text-xs font-medium text-app-muted uppercase tracking-wider">Q2 Revenue</div>
+                <div class="flex items-baseline gap-1.5 mt-1">
+                  <span class="text-2xl font-semibold text-app">{{ formatMoney(stats.actual_revenue_q) }}</span>
+                  <span class="text-xs text-app-muted">/ {{ formatMoney(stats.target_revenue_q) }}</span>
+                </div>
+                <div class="mt-1.5 h-1 rounded-full overflow-hidden" style="background: var(--color-bg-muted);">
+                  <div class="h-full rounded-full" :style="{ width: revenueProgress + '%', background: 'var(--color-brand-primary)' }"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PIPELINE STRIP -->
+            <div class="bg-app rounded-lg border border-app p-4 mb-5">
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <h2 class="text-sm font-semibold text-app">Pipeline overview</h2>
+                  <p class="text-xs text-app-muted mt-0.5">All open deals across stages · Click a stage to filter</p>
+                </div>
+                <button class="text-xs text-app-secondary hover:text-app font-medium">Open full pipeline →</button>
+              </div>
+              <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
+                <div v-for="stage in pipeline" :key="stage.id" class="rounded-md border-l-2 p-3 cursor-pointer hover:opacity-80 transition" :class="stage.color">
+                  <div class="text-xs font-medium uppercase tracking-wider opacity-80">{{ stage.name }}</div>
+                  <div class="flex items-baseline gap-1.5 mt-1">
+                    <span class="text-xl font-semibold">{{ stage.count }}</span>
+                    <span class="text-xs opacity-70">deals</span>
+                  </div>
+                  <div class="text-xs mt-0.5 opacity-80 font-mono" v-if="stage.value > 0">{{ formatMoney(stage.value) }}</div>
+                </div>
+              </div>
+              <div class="mt-4 pt-4 border-t border-app">
+                <div class="text-xs font-medium text-app-muted uppercase tracking-wider mb-2">Active deals · sorted by stage</div>
+                <div class="space-y-1.5">
+                  <div v-for="deal in openDeals" :key="deal.id" class="flex items-center gap-3 p-2 rounded-md hover:bg-app-subtle cursor-pointer">
+                    <span class="text-xs px-2 py-0.5 rounded font-medium border" :class="pipeline.find(s => s.id === deal.stage).color">{{ pipeline.find(s => s.id === deal.stage).name }}</span>
+                    <div class="flex-1 min-w-0 flex items-baseline gap-2">
+                      <span class="text-sm font-medium text-app truncate">{{ deal.company }}</span>
+                      <span class="text-xs text-app-muted truncate">· {{ deal.contact }}</span>
+                    </div>
+                    <div class="flex items-center gap-3 text-xs">
+                      <span class="text-app-muted hidden md:inline">{{ deal.daysInStage }}d in stage</span>
+                      <span class="text-app-secondary font-mono hidden md:inline">{{ deal.expectedClose }}</span>
+                      <span class="font-semibold text-app">{{ formatMoney(deal.value) }}</span>
+                      <div class="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-semibold" :style="{ background: getUser(deal.owner).color }" :title="getUser(deal.owner).name">{{ getUser(deal.owner).initials }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2 mb-3">
+              <div class="flex items-center gap-1 p-1 rounded-lg bg-app-muted">
+                <button v-for="size in [{ k: 'all', l: 'All' }, { k: 'small', l: 'Small (5)' }, { k: 'mid', l: 'Mid (3)' }, { k: 'enterprise', l: 'Enterprise (1)' }]" :key="size.k" @click="sizeFilter = size.k"
+                  :class="['px-3 py-1.5 rounded-md text-xs font-medium transition-colors', sizeFilter === size.k ? 'bg-app text-app shadow-sm' : 'text-app-secondary hover:text-app']">{{ size.l }}</button>
+              </div>
+              <select v-model="ownerFilter" class="text-xs px-3 py-2 rounded-lg border border-app bg-app text-app">
+                <option value="all">All owners</option>
+                <option value="mine">Assigned to me</option>
+                <option value="unassigned">Unassigned</option>
+                <option v-for="u in team.filter(t => t.id !== currentUser.id)" :key="u.id" :value="u.id">{{ u.name }}</option>
+              </select>
+              <select class="text-xs px-3 py-2 rounded-lg border border-app bg-app text-app">
+                <option v-for="bu in businessUnits" :key="bu">{{ bu }}</option>
+              </select>
+              <div class="flex-1"></div>
+              <button class="text-xs px-3 py-2 rounded-lg border border-app text-app-secondary hover:text-app hover:bg-app">Re-run agent</button>
+            </div>
+
+            <div class="space-y-2">
+              <div v-for="company in companies" :key="company.id" class="bg-app rounded-lg border border-app p-4 cursor-pointer card-hover relative" @click="navigate('company', { companyId: company.id })">
+                <div class="flex items-start gap-4">
+                  <div class="w-10 h-10 rounded-lg flex items-center justify-center text-white font-semibold flex-shrink-0" :style="{ background: company.logoColor }">{{ company.logo }}</div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-start justify-between gap-3 mb-1">
+                      <div class="flex items-center gap-2 flex-wrap">
+                        <h3 class="text-base font-semibold text-app">{{ company.name }}</h3>
+                        <span class="text-xs px-1.5 py-0.5 rounded border font-medium uppercase tracking-wider" :class="sizeBadgeClass(company.size)">{{ company.size }}</span>
+                      </div>
+                      <div class="flex items-center gap-3 flex-shrink-0">
+                        <div class="relative" @click.stop>
+                          <button @click="showAssignMenu = showAssignMenu === company.id ? null : company.id" class="flex items-center gap-1.5 px-2 py-1 rounded text-xs hover:bg-app-muted border border-transparent hover:border-app">
+                            <div v-if="company.assignedTo" class="w-5 h-5 rounded-full flex items-center justify-center text-white text-[10px] font-semibold" :style="{ background: getUser(company.assignedTo).color }">{{ getUser(company.assignedTo).initials }}</div>
+                            <div v-else class="w-5 h-5 rounded-full border-2 border-dashed border-app-strong"></div>
+                            <span class="text-app-secondary">{{ company.assignedTo ? getUser(company.assignedTo).name.split(' ')[0] : 'Assign' }}</span>
+                          </button>
+                          <div v-if="showAssignMenu === company.id" class="absolute right-0 top-8 w-56 bg-app rounded-lg border border-app shadow-lg z-20 py-1">
+                            <div class="text-xs font-medium text-app-muted uppercase tracking-wider px-3 py-1.5">Assign to</div>
+                            <button @click="assignCompany(company.id, currentUser.id)" class="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-app-subtle">
+                              <div class="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-semibold" :style="{ background: currentUser.color }">{{ currentUser.initials }}</div>
+                              <span class="text-app">{{ currentUser.name }}</span>
+                              <span class="text-xs text-app-muted ml-auto">(me)</span>
+                            </button>
+                            <button v-for="u in team.filter(t => t.id !== currentUser.id)" :key="u.id" @click="assignCompany(company.id, u.id)" class="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-app-subtle">
+                              <div class="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-semibold" :style="{ background: u.color }">{{ u.initials }}</div>
+                              <span class="text-app">{{ u.name }}</span>
+                              <span class="text-xs text-app-muted ml-auto">{{ u.role }}</span>
+                            </button>
+                            <div class="border-t border-app my-1"></div>
+                            <button v-if="company.assignedTo" @click="assignCompany(company.id, null)" class="w-full px-3 py-2 text-sm text-left text-app-secondary hover:bg-app-subtle">Unassign</button>
+                          </div>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                          <span class="text-xs text-app-muted font-mono">score</span>
+                          <span class="text-sm font-semibold" :style="{ color: company.score >= 80 ? 'var(--color-success)' : company.score >= 70 ? 'var(--color-brand-primary)' : 'var(--color-warning)' }">{{ company.score }}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="text-xs text-app-secondary mb-2">{{ company.industry }} · {{ company.employees.toLocaleString() }} employees · {{ company.location }}</div>
+                    <div class="flex flex-wrap gap-1.5 mb-2">
+                      <span v-for="signal in company.signals.slice(0, 3)" :key="signal.id" class="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium" :class="signalStrengthClass(signal.strength)">{{ signal.label }}</span>
+                    </div>
+                    <div class="flex items-center justify-between flex-wrap gap-2">
+                      <div class="text-xs text-app-secondary">
+                        <strong class="text-app font-medium">{{ company.prospects.length }} prospect{{ company.prospects.length > 1 ? 's' : '' }}</strong> identified ·
+                        <span class="font-mono">{{ company.prospects.map(p => p.title).join(', ') }}</span>
+                      </div>
+                      <span class="text-xs font-medium" style="color: var(--color-brand-primary);">View details →</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- COMPANY -->
+          <div v-else-if="currentView === 'company' && selectedCompany" class="flex-1 p-4 lg:p-6 view-enter overflow-y-auto">
+            <button @click="navigate('dashboard')" class="text-xs text-app-secondary hover:text-app mb-4">← Back to today's list</button>
+            <div class="bg-app rounded-lg border border-app p-6 mb-4">
+              <div class="flex items-start gap-4 mb-4">
+                <div class="w-14 h-14 rounded-lg flex items-center justify-center text-white font-bold text-xl flex-shrink-0" :style="{ background: selectedCompany.logoColor }">{{ selectedCompany.logo }}</div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 flex-wrap mb-1">
+                    <h1 class="text-2xl font-semibold tracking-tight text-app">{{ selectedCompany.name }}</h1>
+                    <span class="text-xs px-1.5 py-0.5 rounded border font-medium uppercase tracking-wider" :class="sizeBadgeClass(selectedCompany.size)">{{ selectedCompany.size }}</span>
+                  </div>
+                  <div class="text-sm text-app-secondary">{{ selectedCompany.industry }} · {{ selectedCompany.employees.toLocaleString() }} employees · {{ selectedCompany.location }}</div>
+                  <div class="text-xs text-app-muted mt-1 font-mono">{{ selectedCompany.funding }}</div>
+                  <div v-if="selectedCompany.assignedTo" class="flex items-center gap-1.5 mt-2 text-xs">
+                    <span class="text-app-muted">Assigned to:</span>
+                    <div class="w-5 h-5 rounded-full flex items-center justify-center text-white text-[10px] font-semibold" :style="{ background: getUser(selectedCompany.assignedTo).color }">{{ getUser(selectedCompany.assignedTo).initials }}</div>
+                    <span class="text-app">{{ getUser(selectedCompany.assignedTo).name }}</span>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="text-xs text-app-muted uppercase tracking-wider">Signal score</div>
+                  <div class="text-3xl font-semibold mt-1" :style="{ color: selectedCompany.score >= 80 ? 'var(--color-success)' : selectedCompany.score >= 70 ? 'var(--color-brand-primary)' : 'var(--color-warning)' }">{{ selectedCompany.score }}</div>
+                </div>
+              </div>
+              <div class="rounded-md p-3 text-sm" style="background: var(--color-brand-primary-light); color: var(--color-brand-primary);">
+                <div class="font-medium mb-1 text-xs uppercase tracking-wider opacity-80">Why this company</div>
+                <p class="leading-relaxed">{{ selectedCompany.rationale }}</p>
+              </div>
+            </div>
+            <div class="grid lg:grid-cols-2 gap-4">
+              <div class="bg-app rounded-lg border border-app p-5">
+                <h2 class="text-sm font-semibold text-app uppercase tracking-wider mb-4">Active signals ({{ selectedCompany.signals.length }})</h2>
+                <div class="space-y-3">
+                  <div v-for="signal in selectedCompany.signals" :key="signal.id" class="border-l-2 pl-3 py-1" :style="{ borderColor: signal.strength === 'critical' ? 'var(--color-danger)' : signal.strength === 'high' ? 'var(--color-warning)' : 'var(--color-warning-light)' }">
+                    <div class="flex items-center justify-between gap-2 mb-1">
+                      <h4 class="text-sm font-medium text-app">{{ signal.label }}</h4>
+                      <span class="text-xs px-1.5 py-0.5 rounded font-medium" :class="signalStrengthClass(signal.strength)">{{ signal.strength }}</span>
+                    </div>
+                    <p class="text-xs text-app-secondary leading-relaxed mb-1">{{ signal.evidence }}</p>
+                    <div class="text-xs text-app-muted font-mono">{{ relativeDate(signal.date) }}</div>
+                  </div>
+                </div>
+              </div>
+              <div class="bg-app rounded-lg border border-app p-5">
+                <h2 class="text-sm font-semibold text-app uppercase tracking-wider mb-4">Prospects ({{ selectedCompany.prospects.length }})</h2>
+                <div class="space-y-3">
+                  <div v-for="prospect in selectedCompany.prospects" :key="prospect.id" @click="navigate('draft', { companyId: selectedCompany.id, prospectId: prospect.id })" class="rounded-md border border-app p-3 cursor-pointer card-hover">
+                    <div class="flex items-start justify-between gap-2 mb-2">
+                      <div class="flex-1 min-w-0">
+                        <h4 class="text-sm font-medium text-app">{{ prospect.name }}</h4>
+                        <div class="text-xs text-app-secondary">{{ prospect.title }}</div>
+                      </div>
+                      <span class="text-xs px-1.5 py-0.5 rounded-full" style="background: var(--color-success-light); color: var(--color-success);">draft ready</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs">
+                      <span class="font-mono text-app-muted">{{ prospect.email }}</span>
+                      <span class="text-app-muted">·</span>
+                      <span :style="{ color: prospect.emailConfidence > 85 ? 'var(--color-success)' : 'var(--color-warning)' }">{{ prospect.emailConfidence }}% confidence</span>
+                    </div>
+                    <div class="mt-2 text-xs flex items-center gap-1.5" style="color: var(--color-brand-primary);">Open draft → <span class="font-mono opacity-60">3 follow-ups pre-staged</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- DRAFT 3-COLUMN -->
+          <div v-else-if="currentView === 'draft' && selectedProspect" class="flex-1 flex view-enter overflow-hidden">
+            <div class="flex-1 min-w-0 overflow-y-auto p-4 lg:p-6">
+              <button @click="navigate('company', { companyId: selectedCompany.id })" class="text-xs text-app-secondary hover:text-app mb-4">← Back to {{ selectedCompany.name }}</button>
+              <div v-if="selectedCompany.prospects.length > 1" class="flex gap-1 mb-4 p-1 rounded-lg bg-app-muted inline-flex">
+                <button v-for="p in selectedCompany.prospects" :key="p.id" @click="navigate('draft', { companyId: selectedCompany.id, prospectId: p.id })"
+                  :class="['px-3 py-1.5 rounded-md text-xs font-medium transition-colors', selectedProspectId === p.id ? 'bg-app text-app shadow-sm' : 'text-app-secondary hover:text-app']">{{ p.name }}</button>
+              </div>
+              <div class="mb-4">
+                <h1 class="text-xl font-semibold tracking-tight text-app">Email draft for {{ selectedProspect.name }}</h1>
+                <p class="text-sm text-app-secondary mt-0.5">{{ selectedProspect.title }} · {{ selectedCompany.name }}</p>
+              </div>
+              <div class="bg-app rounded-lg border border-app overflow-hidden mb-4">
+                <div class="border-b border-app p-4 space-y-1.5">
+                  <div class="flex gap-3 text-sm">
+                    <span class="text-app-muted w-16 flex-shrink-0">From:</span>
+                    <span class="font-mono text-app">{{ draftEmail.from }}</span>
+                  </div>
+                  <div class="flex gap-3 text-sm flex-wrap">
+                    <span class="text-app-muted w-16 flex-shrink-0">To:</span>
+                    <span class="font-mono text-app">{{ selectedProspect.email }}</span>
+                    <span class="text-xs px-1.5 py-0.5 rounded font-medium" :style="{ background: selectedProspect.emailConfidence > 85 ? 'var(--color-success-light)' : 'var(--color-warning-light)', color: selectedProspect.emailConfidence > 85 ? 'var(--color-success)' : 'var(--color-warning)' }">{{ selectedProspect.emailConfidence }}% confidence</span>
+                  </div>
+                  <div class="flex gap-3 text-sm">
+                    <span class="text-app-muted w-16 flex-shrink-0">Subject:</span>
+                    <input v-model="editedDraft.subject" @input="draftEdited = true" class="flex-1 font-medium text-app bg-transparent border-0 outline-0 focus:bg-app-subtle px-1 -mx-1 rounded"/>
+                  </div>
+                </div>
+                <textarea v-model="editedDraft.body" @input="draftEdited = true" rows="14" class="w-full p-4 text-sm leading-relaxed bg-app text-app outline-0 resize-none whitespace-pre-wrap"></textarea>
+                <div class="border-t border-app p-3 flex flex-wrap items-center gap-2 bg-app-subtle">
+                  <button @click="approveDraft" class="btn-primary px-4 py-1.5 rounded-md text-sm font-medium">Approve & queue send</button>
+                  <button class="px-3 py-1.5 rounded-md text-sm border border-app text-app hover:bg-app-muted">Save edits</button>
+                  <button @click="openRejectModal" class="px-3 py-1.5 rounded-md text-sm text-app-secondary hover:text-app">Reject draft</button>
+                  <div class="flex-1"></div>
+                  <span v-if="draftEdited" class="text-xs text-app-muted">Edited · saves on send</span>
+                </div>
+              </div>
+              <div class="bg-app rounded-lg border border-app p-5">
+                <div class="flex items-center justify-between mb-4">
+                  <h2 class="text-sm font-semibold text-app uppercase tracking-wider">3-touch follow-up sequence</h2>
+                  <span class="text-xs text-app-muted">Auto-cancels on reply</span>
+                </div>
+                <div class="space-y-2">
+                  <div v-for="fu in draftEmail.followUps" :key="fu.day" class="rounded-md border border-app p-3 flex items-start gap-3">
+                    <div class="w-8 h-8 rounded flex items-center justify-center text-xs font-semibold flex-shrink-0" style="background: var(--color-brand-primary-light); color: var(--color-brand-primary);">D{{ fu.day }}</div>
+                    <div class="flex-1 min-w-0">
+                      <div class="text-sm font-medium text-app truncate">{{ fu.subject }}</div>
+                      <div class="text-xs text-app-secondary truncate">{{ fu.preview }}</div>
+                    </div>
+                    <button class="text-xs text-app-muted hover:text-app">Edit</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <aside class="ctx-rail flex-shrink-0 border-l border-app"
+              :class="[mobileContextOpen ? 'fixed inset-y-0 right-0 z-30 w-80' : 'hidden lg:block', 'lg:w-80']"
+              style="background: var(--color-bg);">
+              <div class="ctx-section">
+                <div class="flex items-start gap-3">
+                  <div class="w-10 h-10 rounded-lg flex items-center justify-center text-white font-semibold flex-shrink-0" :style="{ background: selectedCompany.logoColor }">{{ selectedCompany.logo }}</div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                      <h3 class="text-sm font-semibold text-app">{{ selectedCompany.name }}</h3>
+                      <span class="text-xs px-1.5 py-0.5 rounded border font-medium uppercase tracking-wider" :class="sizeBadgeClass(selectedCompany.size)">{{ selectedCompany.size }}</span>
+                    </div>
+                    <div class="text-xs text-app-secondary mt-0.5">{{ selectedCompany.industry }}</div>
+                    <div class="text-xs text-app-muted mt-0.5 font-mono">{{ selectedCompany.employees }} emp · {{ selectedCompany.location }}</div>
+                  </div>
+                  <div class="text-right flex-shrink-0">
+                    <div class="text-[10px] text-app-muted uppercase tracking-wider">Score</div>
+                    <div class="text-lg font-semibold leading-none mt-0.5" :style="{ color: selectedCompany.score >= 80 ? 'var(--color-success)' : selectedCompany.score >= 70 ? 'var(--color-brand-primary)' : 'var(--color-warning)' }">{{ selectedCompany.score }}</div>
+                  </div>
+                </div>
+                <div class="text-xs text-app-muted mt-2 font-mono">{{ selectedCompany.funding }}</div>
+              </div>
+              <div class="ctx-section">
+                <div class="text-xs font-medium uppercase tracking-wider mb-1.5" style="color: var(--color-brand-primary);">Why this company</div>
+                <p class="text-xs leading-relaxed text-app-secondary">{{ selectedCompany.rationale }}</p>
+              </div>
+              <div class="ctx-section">
+                <div class="text-xs font-medium uppercase tracking-wider mb-3 text-app-muted">Active signals · {{ selectedCompany.signals.length }}</div>
+                <div class="space-y-2.5">
+                  <div v-for="signal in selectedCompany.signals" :key="signal.id" class="border-l-2 pl-2.5" :style="{ borderColor: signal.strength === 'critical' ? 'var(--color-danger)' : signal.strength === 'high' ? 'var(--color-warning)' : 'var(--color-warning-light)' }">
+                    <div class="flex items-center justify-between gap-2 mb-0.5">
+                      <h4 class="text-xs font-semibold text-app">{{ signal.label }}</h4>
+                      <span class="text-[10px] px-1 py-px rounded font-semibold" :class="signalStrengthClass(signal.strength)">{{ signal.strength }}</span>
+                    </div>
+                    <p class="text-[11px] leading-snug text-app-secondary">{{ signal.evidence }}</p>
+                    <div class="text-[10px] text-app-muted font-mono mt-0.5">{{ relativeDate(signal.date) }}</div>
+                  </div>
+                </div>
+              </div>
+              <div class="ctx-section">
+                <div class="text-xs font-medium uppercase tracking-wider mb-3 text-app-muted">Prospect</div>
+                <div class="text-sm font-semibold text-app">{{ selectedProspect.name }}</div>
+                <div class="text-xs text-app-secondary">{{ selectedProspect.title }}</div>
+                <div class="mt-2 space-y-1 text-xs">
+                  <div class="flex gap-2">
+                    <span class="text-app-muted w-14">Email:</span>
+                    <span class="font-mono text-app text-[11px]">{{ selectedProspect.email }}</span>
+                  </div>
+                  <div class="flex gap-2">
+                    <span class="text-app-muted w-14">Confidence:</span>
+                    <span :style="{ color: selectedProspect.emailConfidence > 85 ? 'var(--color-success)' : 'var(--color-warning)' }">{{ selectedProspect.emailConfidence }}%</span>
+                  </div>
+                  <div class="flex gap-2">
+                    <span class="text-app-muted w-14">LinkedIn:</span>
+                    <a class="font-mono text-[11px]" style="color: var(--color-brand-primary);">/in/{{ selectedProspect.linkedin }}</a>
+                  </div>
+                  <div class="flex gap-2">
+                    <span class="text-app-muted w-14">Function:</span>
+                    <span class="text-app capitalize">{{ selectedProspect.function }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="ctx-section" style="background: var(--color-brand-primary-light);">
+                <div class="text-xs font-medium uppercase tracking-wider mb-1.5" style="color: var(--color-brand-primary);">Signals used in this draft</div>
+                <div class="flex flex-wrap gap-1">
+                  <span v-for="s in draftEmail.signalsUsed" :key="s" class="text-[11px] px-2 py-0.5 rounded-full font-medium" style="background: var(--color-bg); color: var(--color-brand-primary);">{{ s }}</span>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </main>
+
+        <div v-if="showAssignMenu" @click="showAssignMenu = null" class="fixed inset-0 z-10"></div>
+
+        <div v-if="showRejectModal" class="fixed inset-0 z-40 flex items-center justify-center p-4 bg-black/50" @click.self="showRejectModal = false">
+          <div class="bg-app rounded-lg shadow-lg w-full max-w-md p-6">
+            <h3 class="text-lg font-semibold text-app mb-1">Why are you rejecting this draft?</h3>
+            <p class="text-sm text-app-secondary mb-4">Your reason helps the agent learn what not to surface.</p>
+            <div class="space-y-2 mb-4">
+              <label v-for="reason in ['Wrong company', 'Wrong person at the company', 'Already approached', 'Already a customer', 'Too small for our ICP', 'Bad timing', 'Other']" :key="reason"
+                class="flex items-center gap-2 p-2.5 rounded-md border cursor-pointer hover:bg-app-subtle"
+                :style="rejectionReason === reason ? { borderColor: 'var(--color-brand-primary)', background: 'var(--color-brand-primary-light)' } : {}">
+                <input type="radio" v-model="rejectionReason" :value="reason"/>
+                <span class="text-sm text-app">{{ reason }}</span>
+              </label>
+            </div>
+            <textarea v-if="rejectionReason === 'Other'" v-model="rejectionNote" rows="2" placeholder="Tell us more so the agent can learn..." class="w-full text-sm p-2 rounded border border-app mb-3 bg-app text-app"></textarea>
+            <div class="flex gap-2 justify-end">
+              <button @click="showRejectModal = false" class="px-4 py-2 text-sm text-app-secondary hover:text-app">Cancel</button>
+              <button @click="submitRejection" :disabled="!rejectionReason" class="btn-primary px-4 py-2 rounded-md text-sm font-medium" :class="!rejectionReason ? 'opacity-50 cursor-not-allowed' : ''">Submit rejection</button>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 toast-enter">
+          <div class="bg-app shadow-lg rounded-lg border border-app px-4 py-3 flex items-center gap-3 text-sm">
+            <div class="w-2 h-2 rounded-full" style="background: var(--color-success);"></div>
+            <span class="text-app">{{ toast }}</span>
+          </div>
+        </div>
+      </div>
+      `
+    };
+
+    createApp(App).mount('#app');
+  </script>
+</body>
+</html>
